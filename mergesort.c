@@ -72,6 +72,56 @@ int * merge(int * vector1, int size1, int * vector2, int size2){
     return res;
 }
 
+void pSort(int n, int *dataCopy){
+    int chunk, rest, begin, end;
+    int my_rank = omp_get_thread_num();
+    int thread_count = omp_get_num_threads();
+    chunk = n / thread_count;
+    rest = n % thread_count;
+    begin = my_rank * chunk;
+    end = begin + chunk -1;
+    if(rest){
+        if(my_rank < rest){
+            begin = begin + my_rank;
+            end = end + my_rank;
+        } else {
+            begin = begin + rest;
+            end = end + rest;
+        }
+    }
+    sort(dataCopy, begin, end);
+}
+
+void pMerge(int n, int *dataCopy){
+    int chunk, rest, begin, end, begin1, begin2, end1, end2, *newVector, i, j;
+    int my_rank = omp_get_thread_num();
+    int thread_count = omp_get_num_threads();
+    chunk = n / thread_count;
+    rest = n % thread_count;
+    begin = my_rank * chunk;
+    end = begin + chunk -1;
+    if(rest){
+        if(my_rank < rest){
+            begin = begin + my_rank;
+            end = end + my_rank;
+        } else {
+            begin = begin + rest;
+            end = end + rest;
+        }
+    }
+    begin1= begin;
+    end1 = (end - begin) / 2;
+    begin2 = end - end1;
+    end2 = end;
+    printf("begin1 = %d end1 = %d begin2 = %d end2 = %d\n", begin1, end1, begin2, end2);
+    newVector = merge(&dataCopy[begin1], end1, &dataCopy[begin2], end2);
+    j = 0;
+    for(i = begin1; i <= end2; i++){
+        dataCopy[i] = newVector[j];
+        j++;
+    }
+}
+
 void Hello(void) {
    	int my_rank = omp_get_thread_num();
    	int thread_count = omp_get_num_threads();
@@ -82,7 +132,7 @@ void Hello(void) {
 int main(int argc, char* argv[]) {
 	int thread_count = strtol(argv[1], NULL, 10);
    	double start, finish;
-   	int i, j, k, n;
+   	int i, j, k, n, x;
    	int *dataIn, *dataCopy;
    	scanf("%d", &i);
    	while(i > 0){
@@ -98,33 +148,14 @@ int main(int argc, char* argv[]) {
     		}
     		start = omp_get_wtime();
     		//Início do Sort
-    		/*
-			for (thread = 0; thread < thread_count; thread++){  
-        		pthread_create(&thread_handles[thread], NULL, ptsort, (void*) thread);  
-      		}
-    		*/
     		#pragma omp parallel num_threads(thread_count) 
-	   			Hello();
+	   			pSort(n, dataCopy);
     		//Fim do Sort
     		//Início do Merge
-	   		/*
-			for(x = thread_count/2; x > 0; x = x/2){
-		        thread_count = x;
-		        //Cria x threads de merge
-		        for (thread = 0; thread < x; thread++){  
-		          pthread_create(&thread_handles[thread], NULL, ptmerge, (void*) thread);  
-		        } 
-		        //Mata as threads
-		        for (thread = 0; thread < x; thread++){ 
-		          pthread_join(thread_handles[thread], NULL);
-		        } 
-		        if(x == 1){
-		          break;
-		        }
-		    }
-	   		*/
-	   		#pragma omp parallel num_threads(thread_count) 
-	   			Hello();
+            for(x = thread_count / 2; x > 0; x = x / 2){
+                #pragma omp parallel num_threads(x) 
+                    pMerge(n, dataCopy);
+            }   		
     		//Fim do Merge			
 	   		finish = omp_get_wtime();
 	   		for(j = 0; j < n; j++){
