@@ -115,7 +115,7 @@ void pMerge(int n, int *dataCopy){
     end2 = end;
     tam1 = end1 - begin1 + 1;
     tam2 = end2 - begin2 + 1;
-    printf("begin1 = %d end1 = %d tam1 = %d\nbegin2 = %d end2 = %d tam2 = %d\n", begin1, end1, begin2, end2);
+   // printf("begin1 = %d end1 = %d tam1 = %d\nbegin2 = %d end2 = %d tam2 = %d\n", begin1, end1, begin2, end2);
     newVector = merge(&dataCopy[begin1], tam1, &dataCopy[begin2], tam2);
     j = 0;
     for(i = begin1; i <= end2; i++){

@@ -1,4 +1,5 @@
 mergeSort
 =========
 
-mergeSort
+mergeSort utilizando openMP
+ 
