@@ -93,7 +93,7 @@ void pSort(int n, int *dataCopy){
 }
 
 void pMerge(int n, int *dataCopy){
-    int chunk, rest, begin, end, begin1, begin2, end1, end2, *newVector, i, j;
+    int chunk, rest, begin, end, begin1, begin2, end1, end2, tam1, tam2, *newVector, i, j;
     int my_rank = omp_get_thread_num();
     int thread_count = omp_get_num_threads();
     chunk = n / thread_count;
@@ -113,8 +113,10 @@ void pMerge(int n, int *dataCopy){
     end1 = (end - begin) / 2;
     begin2 = end - end1;
     end2 = end;
-    printf("begin1 = %d end1 = %d begin2 = %d end2 = %d\n", begin1, end1, begin2, end2);
-    newVector = merge(&dataCopy[begin1], end1, &dataCopy[begin2], end2);
+    tam1 = end1 - begin1 + 1;
+    tam2 = end2 - begin2 + 1;
+    printf("begin1 = %d end1 = %d tam1 = %d\nbegin2 = %d end2 = %d tam2 = %d\n", begin1, end1, begin2, end2);
+    newVector = merge(&dataCopy[begin1], tam1, &dataCopy[begin2], tam2);
     j = 0;
     for(i = begin1; i <= end2; i++){
         dataCopy[i] = newVector[j];
@@ -150,6 +152,8 @@ int main(int argc, char* argv[]) {
     		//Início do Sort
     		#pragma omp parallel num_threads(thread_count) 
 	   			pSort(n, dataCopy);
+            #pragma omp parallel num_threads(thread_count) 
+                Hello();
     		//Fim do Sort
     		//Início do Merge
             for(x = thread_count / 2; x > 0; x = x / 2){
