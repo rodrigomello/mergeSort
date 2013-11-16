@@ -109,13 +109,15 @@ void pMerge(int n, int *dataCopy){
             end = end + rest;
         }
     }
-    begin1= begin;
+    begin1 = begin;
     end1 = (end - begin) / 2;
     begin2 = end - end1;
+    end1 = begin2 - 1;
     end2 = end;
     tam1 = end1 - begin1 + 1;
     tam2 = end2 - begin2 + 1;
-   // printf("begin1 = %d end1 = %d tam1 = %d\nbegin2 = %d end2 = %d tam2 = %d\n", begin1, end1, begin2, end2);
+    //printf("begin %d, end %d\n",begin, end );
+    //printf("thread %d -> begin1 %d, end1 %d tam1 %d, begin2 %d, end2 %d, tam2 %d \n",my_rank, begin1, end1, tam1, begin2, end2, tam2 );
     newVector = merge(&dataCopy[begin1], tam1, &dataCopy[begin2], tam2);
     j = 0;
     for(i = begin1; i <= end2; i++){
@@ -151,14 +153,17 @@ int main(int argc, char* argv[]) {
     		start = omp_get_wtime();
     		//Início do Sort
     		#pragma omp parallel num_threads(thread_count) 
+            {
 	   			pSort(n, dataCopy);
-            #pragma omp parallel num_threads(thread_count) 
-                Hello();
+            }
+                //Hello();
     		//Fim do Sort
     		//Início do Merge
             for(x = thread_count / 2; x > 0; x = x / 2){
                 #pragma omp parallel num_threads(x) 
+                {
                     pMerge(n, dataCopy);
+                }
             }   		
     		//Fim do Merge			
 	   		finish = omp_get_wtime();

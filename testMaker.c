@@ -5,7 +5,7 @@
 #include <stdio.h>
 #include <time.h>
 
-#define MAX 16000
+#define MAX 1000000
 
 int main(){
 	int i, x;
@@ -13,7 +13,7 @@ int main(){
 	printf("%d\n", 1);
 	printf("%d\n",MAX );	
 	for (i = MAX; i > 0; i--){
-		printf("%d ", rand()%MAX);
+		printf("%d ", i);
 	}
 	printf("\n%d", 0);
 }
