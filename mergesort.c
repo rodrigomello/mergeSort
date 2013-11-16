@@ -126,10 +126,18 @@ void pMerge(int n, int *dataCopy){
     }
 }
 
-void Hello(void) {
-   	int my_rank = omp_get_thread_num();
-   	int thread_count = omp_get_num_threads();
-   	printf("Hello from thread %d of %d\n", my_rank, thread_count);
+/*Is ordered function*/
+int isOrdered(int n, int *vector){
+    int i, aux;
+    aux = vector[0];
+    for(i = 1; i < n; i++){
+        if(aux > vector[i]){
+            return 0;
+        } else {
+            aux = vector[i];
+        }
+    }
+    return 1;
 }
 
 /*Main*/
@@ -156,7 +164,6 @@ int main(int argc, char* argv[]) {
             {
 	   			pSort(n, dataCopy);
             }
-                //Hello();
     		//Fim do Sort
     		//Início do Merge
             for(x = thread_count / 2; x > 0; x = x / 2){
@@ -167,10 +174,16 @@ int main(int argc, char* argv[]) {
             }   		
     		//Fim do Merge			
 	   		finish = omp_get_wtime();
-	   		for(j = 0; j < n; j++){
-	   			printf("%d ", dataCopy[j]);
-	   		}
-	    	printf("\nElapsed time = %f seconds\n", finish - start);
+            //Verificando Ordenacao
+            if(isOrdered(n, dataCopy)){
+                for(j = 0; j < n; j++){
+                    printf("%d ", dataCopy[j]);
+                }
+                printf("\nElapsed time = %f seconds\n", finish - start);
+            } else {
+                printf("Something went wrong!\n");
+            }
+	   		
     	}
     	free(dataIn);
     	free(dataCopy);
